@@ -14,15 +14,16 @@ export const getAllProducts = async (req, res) => {
 };
 
 export const createProduct = async (req, res) => {
-    const {name, image, price} = req.body;
-    if(!name || !image || !price) {
+    const {name, image, price, description} = req.body;
+    if(!name || !image || !price || !description) {
         return res.status(400).json({success: false, message: "All fields are required" });
     }
+    console.log(name, image, price, description);
     try {
         
       const newProduct =  await sql`
-            INSERT INTO products (name, image, price)
-            VALUES (${name}, ${image}, ${price})
+            INSERT INTO products (name, image, price, description)
+            VALUES (${name}, ${image}, ${price},${description})
             RETURNING *`;
         res.status(201).json({success: true, data: newProduct[0]});
 
