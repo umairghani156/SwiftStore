@@ -46,7 +46,7 @@ const HomePage = () => {
     ) as HTMLDialogElement;
     if (modal) modal.showModal();
   };
-
+//Add Product Modal
   const addProductHandlerModal = async (e) => {
     e.preventDefault();
 
@@ -77,7 +77,7 @@ const HomePage = () => {
     toast.error(error.response.data.message);
    }
   }
-
+//Close Modal Handler
   const closeModal = () => {
     const modal = document.getElementById(
       "add_product_modal"
