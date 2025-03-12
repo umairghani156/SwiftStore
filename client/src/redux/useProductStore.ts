@@ -10,10 +10,7 @@ export interface Product{
     created_at: string,
 };
 
-// interface ProductState{
-//     success: boolean,
-//     data: Product[],
-// }
+
 
 interface ProductState{
     product: Product[],
