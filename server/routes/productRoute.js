@@ -9,5 +9,5 @@ productRoutes.get("/:id", getProduct);
 productRoutes.post("/", createProduct);
 productRoutes.put("/:id", updateProduct);
 productRoutes.delete("/:id", deleteProduct);
-
+productRoutes.get("/getspecific-product/:id", updateProduct);
 export default productRoutes;
