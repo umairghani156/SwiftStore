@@ -58,6 +58,7 @@ const HomePage = () => {
   });
   
   // Log the product data as an object
+  dispatch(productPending());
    try {
     const response = await axios.post(`${import.meta.env.VITE_BASE_URL}products`, productObj);
 
@@ -182,7 +183,7 @@ const HomePage = () => {
             </div>
             <div>
               <label className="label py-2">
-                <span className="label-text text-sm font-semibold">Price</span>
+                <span className="label-text text-sm font-semibold">Description</span>
               </label>
               <input
                 type="text"
@@ -194,7 +195,8 @@ const HomePage = () => {
 
               <div className="flex justify-end mt-4">
                 <button className="btn" type="button" onClick={closeModal}>Close</button>
-                <button className="btn btn-primary" type="submit">Save</button>
+                <button className="btn btn-primary" type="submit">{
+                  loading ? <span className="loading loading-spinner"></span> : "Add Product"}</button>
                 </div>
              
           </form>

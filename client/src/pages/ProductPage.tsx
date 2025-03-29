@@ -2,8 +2,9 @@ import { ArrowLeftIcon, Trash2Icon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams, useResolvedPath } from "react-router-dom";
-import { getProduct, productPending, updateProduct } from "../redux/useProductStore";
+import { getProduct, Product, productPending, updateProduct } from "../redux/useProductStore";
 import toast, { Toaster } from "react-hot-toast";
+import axios from "axios";
 
 const ProductPage = () => {
   const navigate = useNavigate();
@@ -38,19 +39,34 @@ const ProductPage = () => {
       toast.error("All fields are required")
       return
     }
-    dispatch<any>(productPending() );
+    dispatch(productPending() );
     try {
-     const result = await dispatch<any>(updateProduct({...formData, id: productId}));
-     const message = result.payload.response.data.message 
-     if(result.payload.response.success === false){
-      toast.error(message)
-     }
+      let updateVal: Product ={
+        id: productId,
+        name: formData.name,
+        price: formData.price,
+        image: formData.image,
+        description: formData.description,
+        created_at: currentProduct?.created_at
+      }
+     dispatch<any>(updateProduct(updateVal));
+     
       toast.success("Product updated successfully")
-     navigate("/");
+       navigate("/");
     } catch (error) {
       toast.error(error.response.data.message)
     }
    
+  }
+
+  const deleteProductHandler = async (id: number) => {
+    try {
+      const result = await axios.delete(`${import.meta.env.VITE_BASE_URL}products/${id}`);
+      toast.success("Product deleted successfully");
+      navigate("/");
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
   }
   return (
     <>
@@ -112,7 +128,7 @@ const ProductPage = () => {
                   />
                 </div>
                 <div className="w-full flex justify-end mt-4">
-                  <button className="btn btn-error mr-2">
+                  <button className="btn btn-error mr-2" type="button" onClick={() => deleteProductHandler(currentProduct?.id)}>
                     <Trash2Icon className="size-4 mr-2"/>
                     Delete
                   </button>

@@ -49,10 +49,9 @@ const productSlice = createSlice({
     name: "product",
     initialState: INITIAL_STATE,
     reducers: {
-        productPending: (state, action) => {
+        productPending: (state) => {
             state.loading = true;
             state.error = null;
-            state.product = [];
         },
         productSuccess: (state, action) => {
             state.product = action.payload;
@@ -68,6 +67,7 @@ const productSlice = createSlice({
             state.product = state.product.filter((product) => product.id !== action.payload);
         },
         addProduct: (state, action)=>{
+            state.loading = false;
             state.product.unshift(action.payload);
         }
     },
