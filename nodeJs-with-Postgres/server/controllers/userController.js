@@ -1,4 +1,5 @@
 import {sendVerificationEmail } from "../constants/EmailFunc.js";
+import admin from "../constants/firebaseAdmin.js";
 import { GenerateAccessToken, GenerateRefreshToken } from "../constants/Token.js";
 import prisma from "../DB/db.config.js";
 import bcrypt from 'bcryptjs';
@@ -84,6 +85,25 @@ export const loginUser = async (req, res) => {
             return res.status(400).json({ success: false, message: "Invalid credentials" });
         }
 
+        if (!user.isVerified) {
+            const verificationToken = crypto.randomBytes(3).toString("hex");
+            const verificationTokenExpiry = new Date(Date.now() + 1 * 60 * 1000);
+            await prisma.user.update({
+                where: { email: user.email },
+                data: {
+                    verificationToken,
+                    verificationTokenExpiry,
+                },
+            });
+            await sendVerificationEmail(user.email, verificationToken); 
+            
+            // If user is not verified, send a message to check email
+            return res.status(403).json({
+                success: false,
+                message: "Your account is not verified. A new verification email has been sent. Please check your email.",
+            });
+        }
+
         // Generate access token and refresh token
         const accessToken = GenerateAccessToken({ data: user, expiresIn: "2m" });
         const refresh_token = GenerateRefreshToken({ data: user, expiresIn: "24h" });
@@ -151,7 +171,7 @@ export const logoutUser = (req, res) => {
 
 export const verifyUserController = async (req, res) =>{
     const { verificationToken } = req.body; 
-    console.log("vavv", verificationToken)
+   
     if (!verificationToken) {
         return res.status(400).json({ message: "Verification token is required" });
     };
@@ -171,7 +191,6 @@ export const verifyUserController = async (req, res) =>{
         if (user.verificationTokenExpiry < new Date()) {
             return res.status(400).json({ message: "Verification token has expired" });
         }
-        console.log("User found:", user); // Log the user for debugging
         
         const updatedUser = await prisma.user.update({
             where: {
@@ -240,3 +259,41 @@ export const resendVerificationToken = async (req, res) => {
         return res.status(500).json({ success: false, message: "Internal server error" });
     }
 };
+
+
+// Verify Google account
+export const verifyGoogleAccount = async ( req, res) => {
+    const idToken = req.body.idToken; // Get the ID token from the request body
+    if (!idToken) {
+        return res.status(400).json({success: false, message: "ID token is required" });
+    }
+  try {
+        // Verify the ID token using Firebase Admin SDK
+        const decodedToken = await admin.auth().verifyIdToken(idToken);
+        const { uid, email, name } = decodedToken; // Extract user info from the decoded token
+
+        // Check if user already exists in the database
+        const existingUser = await prisma.user.findUnique({
+            where: { email },
+        });
+
+        if (existingUser) {
+            return res.status(200).json({success: true, message: "User already exists", user: existingUser });
+        }
+
+        // Create a new user in the database
+        const newUser = await prisma.user.create({
+            data: {
+                name,
+                email,
+                password: null, // No password for Google sign-in
+                isVerified: true, // Automatically verified for Google sign-in
+            },
+        });
+
+        return res.status(201).json({success: true, message: "User registered successfully", user: newUser });
+    
+  } catch (error) {
+    return res.status(400).json({success: false, message: "Invalid ID token" });
+  }
+}

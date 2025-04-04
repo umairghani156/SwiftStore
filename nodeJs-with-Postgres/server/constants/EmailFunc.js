@@ -26,7 +26,7 @@ export const sendVerificationEmail = async (email, otp) => {
                         <strong>${otp}</strong>
                     </h3>
                     <p>This OTP is valid for a limited time. If you did not request this, please ignore this email.</p>
-                    <p>Best regards, <br/> Your Application Team</p>
+                    <p>Best regards, <br/> ZetaTech</p>
                 </div>
             `,
         };
