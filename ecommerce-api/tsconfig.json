@@ -1,0 +1,17 @@
+{
+  "extends": "@tsconfig/node22/tsconfig.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src",
+    "allowJs": true,
+    "checkJs": true,
+    "noEmit": false,
+    "esModuleInterop": true,
+    "moduleResolution": "bundler",  // Changed from "NodeNext" to "bundler"
+    "module": "ESNext",             // Changed from "NodeNext" to "ESNext"
+    "target": "ES2020",
+    "resolveJsonModule": true
+  },
+  "include": ["./src/**/*"],
+  "exclude": ["node_modules"]
+}
