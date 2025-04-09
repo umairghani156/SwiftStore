@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  # Frontend service (React app served by nginx)
+  frontend:
+    build:
+      context: ./client  # Path to the client folder
+    container_name: frontend
+    networks:
+      - app-network
+    ports:
+      - "8080:80"  # Maps port 8080 on the host to port 80 in the container (nginx)
+    volumes:
+      - ./client/dist:/usr/share/nginx/html  # Serve the built React app (dist folder)
+    depends_on:
+      - backend  # Ensure the backend is running before frontend starts
+
+  # Backend service (Node.js)
+  backend:
+    build:
+      context: ./server  # Path to the server folder
+    container_name: backend
+    networks:
+      - app-network
+    ports:
+      - "5000:5000"  # Map port 5000 on the host to port 5000 in the container
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/mydatabase  # MongoDB URI pointing to MongoDB container
+    depends_on:
+      - mongo  # Ensure MongoDB is ready before starting the backend
+
+  # MongoDB service
+  mongo:
+    image: mongo:latest  # Official MongoDB image
+    container_name: mongo
+    networks:
+      - app-network
+    volumes:
+      - mongo-data:/data/db  # Persist MongoDB data in a Docker volume
+    ports:
+      - "27017:27017"  # Expose MongoDB port (optional for local development)
+
+# Custom network for communication between containers
+networks:
+  app-network:
+    driver: bridge
+
+# Define volumes to persist MongoDB data
+volumes:
+  mongo-data:
+    driver: local
