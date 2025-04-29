@@ -81,6 +81,7 @@ export const getVisitorAnalyticsThunk = createAsyncThunk("visitor/getVisitorAnal
 
 export const checkInVisitorThunk = createAsyncThunk("visitor/checkInVisitor", async (data, thunkAPI) => {
   try {
+        console.log("data",data);
          const res = await checkInVisitorAPI(data);
          return res.data;
       } catch (error) {

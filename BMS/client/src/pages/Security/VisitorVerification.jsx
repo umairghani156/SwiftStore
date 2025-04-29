@@ -19,14 +19,17 @@ const VisitorVerificationPage = () => {
  
 
   const handleScan =async (decodedText, decodedResult) => {
-    if (!decodedText || decodedText === scannedData) return;
+    console.log("3. Decoded Text:", decodedText);
+    if (!decodedText || decodedText === scannedData) {
+      console.log("Same QR code scanned again");
+    };
 
    
     setScannedData(decodedText);
     setScanError(null);
 
     try {
-      // Try to parse the QR code data
+     
       let qrData;
       try {
         qrData = JSON.parse(decodedText);
@@ -77,6 +80,7 @@ const VisitorVerificationPage = () => {
 
   const initializeScanner = () => {
     if (!html5QrCode.current) {
+      console.log("Initializing scanner...");
       html5QrCode.current = new Html5Qrcode("qr-reader");
     }
   };
@@ -87,6 +91,7 @@ const VisitorVerificationPage = () => {
         if (html5QrCode.current.isScanning) {
           await html5QrCode.current.stop();
         }
+        console.log("Cleaning up scanner...");
         html5QrCode.current.clear();
         html5QrCode.current = null;
       }
@@ -109,6 +114,7 @@ const VisitorVerificationPage = () => {
 
   const startScanning = async () => {
     try {
+      console
       initializeScanner();
       
       if (!html5QrCode.current) {
