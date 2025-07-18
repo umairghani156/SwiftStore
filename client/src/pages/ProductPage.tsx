@@ -59,6 +59,8 @@ const ProductPage = () => {
    
   }
 
+  // Delete Product Handler
+
   const deleteProductHandler = async (id: number) => {
     try {
       const result = await axios.delete(`${import.meta.env.VITE_BASE_URL}products/${id}`);
